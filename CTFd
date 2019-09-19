@@ -1,0 +1,24 @@
+proxy_cache_path /home/CTFd/nginxCache levels=1:2 keys_zone=my_cache:10m max_size=8g
+             	inactive=10m use_temp_path=off;
+server {
+    	listen 80 default_server;
+    	server_name _;
+    	return 301 https://$host$request_uri;
+}
+
+server {
+    	listen 443 ssl;
+    	#ssl_certificate /etc/letsencrypt/live/bandit.baycyberctf.net/fullchain.pem;
+    	#ssl_certificate_key /etc/letsencrypt/live/bandit.baycyberctf.net/privkey.pem;
+    	#include /etc/letsencrypt/options-ssl-nginx.conf;
+    	server_name CTFd;
+    	location = /favicon.ico { access_log off; log_not_found off; }
+ location /static/ {
+    	root /home/CTFd/CTFd/CTFd;
+ }
+    	location / {
+    	include proxy_params;
+    	proxy_cache my_cache;
+    	proxy_pass http://localhost:8000;
+    	}
+ }
